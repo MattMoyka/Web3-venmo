@@ -2,9 +2,14 @@
 
 
 require('@nomiclabs/hardhat-waffle');
+import { config as dotenvConfig } from "dotenv";
+import { resolve } from "path";
 
-const PRIVATE_KEY = process.env.REACT_PRIVATE_KEY || "your private key"
-console.log(PRIVATE_KEY)
+
+dotenvConfig({ path: resolve(__dirname, "./.env") });
+
+const PRIVATE_KEY = process.env.VITE_PRIVATE_KEY
+
 module.exports = {
   solidity: '0.8.0',
   networks: {
