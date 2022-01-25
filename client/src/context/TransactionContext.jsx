@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ethers } from 'ethers'
 import { contractABI, contractAddress } from '../utils/constants'
 import { createContext } from "react";
+import { parse } from "@ethersproject/transactions";
 
 export const TransactionContext = createContext()
 
@@ -24,6 +25,11 @@ export const TransactionProvider = ({ children }) => {
     keyword: '',
     message: ''
   })
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'))
+
+
   const handleChange = (e, name) => {
     setFormData((prevState) => ({ ...prevState, [name]: e.target.value }))
   }
@@ -75,10 +81,18 @@ export const TransactionProvider = ({ children }) => {
           to: addressTo,
           gas: '0x5208', //21000 wei
           value: parsedAmount._hex,
-
-
         }]
       })
+
+      const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmount, message, keyword)
+      setIsLoading(true)
+      console.log(`Loading ${transactionHash.hash}`)
+      await transactionHash.wait()
+      setIsLoading(false)
+      console.log(`Success ${transactionHash.hash}`)
+
+      const transactionCount = await transactionContract.getTransactionCount()
+      setTransactionCount(transactionCount.toNumber())
 
     } catch (error) {
       console.log(error)
