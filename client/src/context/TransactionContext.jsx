@@ -66,11 +66,16 @@ export const TransactionProvider = ({ children }) => {
       if (!ethereum) return alert("Please install metamask")
       const { addressTo, amount, keyword, message } = formData
       const transactionContract = getEthereumContract();
+      const parsedAmount = ethers.utils.parseEther(amount)
 
       await ethereum.request({
         method: 'eth_sendTransaction',
         params: [{
           from: currentAccount,
+          to: addressTo,
+          gas: '0x5208', //21000 wei
+          value: parsedAmount._hex,
+
 
         }]
       })
